@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SU ERP Scraper</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 35px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #ddd;
+        }
+
+        input[type="submit"] {
+            background-color: #1e90ff;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0b68c1;
+        }
+
+        .error {
+            color: #ff4d4d;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid #1e90ff;
+            border-radius: 6px;
+        }
+
+        .result p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .result strong {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>SU ERP Login</h2>
+        <form method="POST">
+            <label for="userid">Email / Student ID:</label>
+            <input type="text" id="userid" name="userid" placeholder="Enter your ID" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <input type="submit" value="Login">
+        </form>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% elif data %}
+        <div class="result">
+            <p><strong>Name:</strong> {{ data.get('name', '') }}</p>
+            <p><strong>ID:</strong> {{ data.get('sid', '') }}</p>
+            <p><strong>Mobile:</strong> {{ data.get('mobile', '') }}</p>
+            <p><strong>Program:</strong> {{ data.get('program', '') }}</p>
+            <p><strong>Semester Wise Closing Balance:</strong> {{ data.get('semester_balance_value', '') }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

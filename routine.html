@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Class Routine</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        #routineForm {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #error {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #ffebee;
+        }
+
+        .day-section {
+            background: white;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+
+        #routineTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            background: white;
+        }
+
+        #routineTable th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #routineTable td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #routineTable tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .course-cell {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .time-cell {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .room-cell {
+            color: #27ae60;
+        }
+
+        .teacher-cell {
+            color: #8e44ad;
+        }
+    </style>
+</head>
+<body>
+    <h1>Class Routine</h1>
+
+    <form id="routineForm">
+        <input type="text" name="student_id" placeholder="Student ID" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="number" name="semester_id" placeholder="Semester ID" required>
+        <input type="number" name="year" placeholder="Year" required>
+        <button type="submit">Fetch Routine</button>
+    </form>
+
+    <div id="error"></div>
+    <div id="routineContainer"></div>
+
+    <script>
+        const form = document.getElementById("routineForm");
+        const routineContainer = document.getElementById("routineContainer");
+        const errorDiv = document.getElementById("error");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            routineContainer.innerHTML = "";
+            errorDiv.textContent = "";
+
+            const formData = new FormData(form);
+            const payload = {
+                student_id: formData.get("student_id"),
+                password: formData.get("password"),
+                semester_id: parseInt(formData.get("semester_id")),
+                year: parseInt(formData.get("year"))
+            };
+
+            try {
+                const response = await fetch("/api/routine", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const data = result.data;
+                    // Create table
+                    const table = document.createElement('table');
+                    table.id = 'routineTable';
+
+                    // Add table headers
+                    const thead = document.createElement('thead');
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Room</th>
+                            <th>Course</th>
+                            <th>Teacher</th>
+                        </tr>
+                    `;
+                    table.appendChild(thead);
+
+                    // Add table body
+                    const tbody = document.createElement('tbody');
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.Day}</td>
+                            <td>${row.Time}</td>
+                            <td>${row.Room}</td>
+                            <td>${row.Course}</td>
+                            <td>${row.Teacher}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    routineContainer.appendChild(table);
+                } else {
+                    errorDiv.textContent = result.error || "Failed to fetch routine.";
+                }
+            } catch (err) {
+                errorDiv.textContent = "Server error: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>
