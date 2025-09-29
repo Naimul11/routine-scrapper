@@ -59,7 +59,17 @@
             padding: 10px;
             margin: 10px 0;
             border-radius: 4px;
+            display: none;
+        }
+
+        .error-message {
             background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .success-message {
+            background-color: #e8f5e9;
+            color: #2e7d32;
         }
 
         .day-section {
@@ -160,6 +170,8 @@
             e.preventDefault();
             routineContainer.innerHTML = "";
             errorDiv.textContent = "";
+            errorDiv.style.display = "none";
+            errorDiv.classList.remove("error-message", "success-message");
             downloadBtn.style.display = "none";
 
             const formData = new FormData(form);
@@ -192,8 +204,13 @@
                 const result = await response.json();
 
                 if (response.ok) {
+                    // Show success message
+                    errorDiv.textContent = "Login successful! Loading your routine...";
+                    errorDiv.classList.add("success-message");
+                    errorDiv.style.display = "block";
+                    
                     const data = result.data;
-                    lastRoutineData = data; // Save for PDF
+                    lastRoutineData = data;
                     downloadBtn.style.display = "inline-block";
 
                     // Create table
@@ -229,10 +246,15 @@
                     table.appendChild(tbody);
                     routineContainer.appendChild(table);
                 } else {
-                    errorDiv.textContent = result.error || "Failed to fetch routine.";
+                    // Show error message
+                    errorDiv.textContent = "Invalid credentials. Please check your Student ID and Password.";
+                    errorDiv.classList.add("error-message");
+                    errorDiv.style.display = "block";
                 }
             } catch (err) {
                 errorDiv.textContent = "Server error: " + err.message;
+                errorDiv.classList.add("error-message");
+                errorDiv.style.display = "block";
             }
         });
 
