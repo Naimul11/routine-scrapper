@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <title>Class Routine</title>
+    <!-- Add jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -126,6 +129,8 @@
         <button type="submit">Fetch Routine</button>
     </form>
 
+    <button id="downloadPdfBtn" style="display:none; margin-bottom:20px;">Download PDF</button>
+
     <div id="error"></div>
     <div id="routineContainer"></div>
 
@@ -133,11 +138,14 @@
         const form = document.getElementById("routineForm");
         const routineContainer = document.getElementById("routineContainer");
         const errorDiv = document.getElementById("error");
+        const downloadBtn = document.getElementById("downloadPdfBtn");
+        let lastRoutineData = [];
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             routineContainer.innerHTML = "";
             errorDiv.textContent = "";
+            downloadBtn.style.display = "none";
 
             const formData = new FormData(form);
             const payload = {
@@ -158,6 +166,9 @@
 
                 if (response.ok) {
                     const data = result.data;
+                    lastRoutineData = data; // Save for PDF
+                    downloadBtn.style.display = "inline-block";
+
                     // Create table
                     const table = document.createElement('table');
                     table.id = 'routineTable';
@@ -196,6 +207,31 @@
             } catch (err) {
                 errorDiv.textContent = "Server error: " + err.message;
             }
+        });
+
+        // PDF Download Handler
+        downloadBtn.addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Table columns
+            const columns = [
+                { header: 'Day', dataKey: 'Day' },
+                { header: 'Time', dataKey: 'Time' },
+                { header: 'Room', dataKey: 'Room' },
+                { header: 'Course', dataKey: 'Course' },
+                { header: 'Teacher', dataKey: 'Teacher' }
+            ];
+
+            doc.text("Class Routine", 14, 16);
+            doc.autoTable({
+                startY: 22,
+                head: [columns.map(col => col.header)],
+                body: lastRoutineData.map(row => columns.map(col => row[col.dataKey])),
+                styles: { fontSize: 10 }
+            });
+
+            doc.save("routine.pdf");
         });
     </script>
 </body>
