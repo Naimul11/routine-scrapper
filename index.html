@@ -1,152 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>SU ERP Scraper</title>
+    <meta charset="utf-8">
+    <title>Class Routine</title>
+    <!-- Add jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-            background-size: cover;
-            position: relative;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
 
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            z-index: 0;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 35px 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 420px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-
-        h2 {
+        h1 {
             text-align: center;
-            margin-bottom: 25px;
-            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 30px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+        #routineForm {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 14px;
         }
 
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px 12px;
-            margin-bottom: 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.2);
+        button {
+            background-color: #3498db;
             color: white;
-            outline: none;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        input[type="text"]::placeholder,
-        input[type="password"]::placeholder {
-            color: #ddd;
+        button:hover {
+            background-color: #2980b9;
         }
 
-        input[type="submit"] {
-            background-color: #1e90ff;
+        #error {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background-color: #ffebee;
+        }
+
+        .day-section {
+            background: white;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+
+        #routineTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            background: white;
+        }
+
+        #routineTable th {
+            background-color: #34495e;
             color: white;
             padding: 12px;
-            width: 100%;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            text-align: left;
         }
 
-        input[type="submit"]:hover {
-            background-color: #0b68c1;
+        #routineTable td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
         }
 
-        .error {
-            color: #ff4d4d;
-            text-align: center;
-            margin-top: 15px;
+        #routineTable tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .course-cell {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .time-cell {
+            color: #e74c3c;
             font-weight: 500;
         }
 
-        .result {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid #1e90ff;
-            border-radius: 6px;
+        .room-cell {
+            color: #27ae60;
         }
 
-        .result p {
-            margin: 8px 0;
-            font-size: 16px;
-        }
-
-        .result strong {
-            color: #ffffff;
+        .teacher-cell {
+            color: #8e44ad;
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h2>SU ERP Login</h2>
-        <form method="POST">
-            <label for="userid">Email / Student ID:</label>
-            <input type="text" id="userid" name="userid" placeholder="Enter your ID" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            <input type="submit" value="Login">
-        </form>
+    <h1>Class Routine</h1>
 
-        {% if error %}
-        <p class="error">{{ error }}</p>
-        {% elif data %}
-        <div class="result">
-            <p><strong>Name:</strong> {{ data.get('name', '') }}</p>
-            <p><strong>ID:</strong> {{ data.get('sid', '') }}</p>
-            <p><strong>Mobile:</strong> {{ data.get('mobile', '') }}</p>
-            <p><strong>Program:</strong> {{ data.get('program', '') }}</p>
-            <p><strong>Semester Wise Closing Balance:</strong> {{ data.get('semester_balance_value', '') }}</p>
-        </div>
-        {% endif %}
-    </div>
+    <form id="routineForm">
+        <input type="text" name="student_id" placeholder="Student ID" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Fetch Routine</button>
+    </form>
+
+    <button id="downloadPdfBtn" style="display:none; margin-bottom:20px;">Download PDF</button>
+
+    <div id="error"></div>
+    <div id="routineContainer"></div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const month = now.getMonth() + 1; // getMonth() is 0-based
+            let semester_id = 1;
+            if (month >= 5 && month <= 8) {
+                semester_id = 2;
+            } else if (month >= 9 && month <= 12) {
+                semester_id = 3;
+            }
+            const year = now.getFullYear();
+
+            document.querySelector('input[name="semester_id"]').value = semester_id;
+            document.querySelector('input[name="year"]').value = year;
+        });
+
+        const form = document.getElementById("routineForm");
+        const routineContainer = document.getElementById("routineContainer");
+        const errorDiv = document.getElementById("error");
+        const downloadBtn = document.getElementById("downloadPdfBtn");
+        let lastRoutineData = [];
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            routineContainer.innerHTML = "";
+            errorDiv.textContent = "";
+            downloadBtn.style.display = "none";
+
+            const formData = new FormData(form);
+
+            // Guess semester_id and year
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            let semester_id = 1;
+            if (month >= 5 && month <= 8) {
+                semester_id = 2;
+            } else if (month >= 9 && month <= 12) {
+                semester_id = 3;
+            }
+            const year = now.getFullYear();
+
+            const payload = {
+                student_id: formData.get("student_id"),
+                password: formData.get("password"),
+                semester_id: semester_id,
+                year: year
+            };
+
+            try {
+                const response = await fetch("/api/routine", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const data = result.data;
+                    lastRoutineData = data; // Save for PDF
+                    downloadBtn.style.display = "inline-block";
+
+                    // Create table
+                    const table = document.createElement('table');
+                    table.id = 'routineTable';
+
+                    // Add table headers
+                    const thead = document.createElement('thead');
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Room</th>
+                            <th>Course</th>
+                            <th>Teacher</th>
+                        </tr>
+                    `;
+                    table.appendChild(thead);
+
+                    // Add table body
+                    const tbody = document.createElement('tbody');
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.Day}</td>
+                            <td>${row.Time}</td>
+                            <td>${row.Room}</td>
+                            <td>${row.Course}</td>
+                            <td>${row.Teacher}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    routineContainer.appendChild(table);
+                } else {
+                    errorDiv.textContent = result.error || "Failed to fetch routine.";
+                }
+            } catch (err) {
+                errorDiv.textContent = "Server error: " + err.message;
+            }
+        });
+
+        // PDF Download Handler
+        downloadBtn.addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Table columns
+            const columns = [
+                { header: 'Day', dataKey: 'Day' },
+                { header: 'Time', dataKey: 'Time' },
+                { header: 'Room', dataKey: 'Room' },
+                { header: 'Course', dataKey: 'Course' },
+                { header: 'Teacher', dataKey: 'Teacher' }
+            ];
+
+            doc.text("Class Routine", 14, 16);
+            doc.autoTable({
+                startY: 22,
+                head: [columns.map(col => col.header)],
+                body: lastRoutineData.map(row => columns.map(col => row[col.dataKey])),
+                styles: { fontSize: 10 }
+            });
+
+            doc.save("routine.pdf");
+        });
+    </script>
 </body>
-
 </html>

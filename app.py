@@ -85,7 +85,7 @@ def index():
 
 @app.route("/routine")
 def get_routine():
-    return render_template("routine.html")
+    return render_template("index.html")
 
 # ------------------------
 # Route 2: JSON API (new)
