@@ -247,8 +247,3 @@ def api_routine():
     except ValueError as e:
         return {"error": str(e)}, 400
 
-# ------------------------
-# Run server
-# ------------------------
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
