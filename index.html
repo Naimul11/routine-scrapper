@@ -195,7 +195,7 @@
             };
 
             try {
-                const response = await fetch("/api/routine", {
+                const response = await fetch("https://routine-scrapper.onrender.com/api/routine", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
