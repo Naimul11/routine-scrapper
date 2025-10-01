@@ -195,7 +195,7 @@
             };
 
             try {
-                const response = await fetch("api/routine", {
+                const response = await fetch("/api/routine", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
@@ -208,7 +208,7 @@
                     errorDiv.textContent = "Login successful! Loading your routine...";
                     errorDiv.classList.add("success-message");
                     errorDiv.style.display = "block";
-
+                    
                     const data = result.data;
                     lastRoutineData = data;
                     downloadBtn.style.display = "inline-block";
